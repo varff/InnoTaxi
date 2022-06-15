@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package api;
+option go_package = "./api";
+
+message LoginRequest{
+  int32 phone = 1;
+  string password = 2;
+}
+
+message LoginResponse{
+  string token = 1;
+}
+
+message RegisterRequest{
+  string name = 1;
+  string password = 2;
+  int32 phone = 3;
+  string email = 4;
+}
+
+message Rating {
+  int32 rate = 1;
+}
+
+message Phone {
+  int32 phone=1;
+}
+
+message IfSucceed{
+  bool success=1;
+}
+
+
+service User{
+  rpc UserRegister(RegisterRequest) returns (LoginResponse);
+  rpc UserLogin(LoginRequest) returns (LoginResponse);
+  rpc UserCheckRate(Phone) returns (Rating);
+  rpc UserRateOrder(Phone) returns (IfSucceed);
+}
