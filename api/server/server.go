@@ -1,22 +1,29 @@
-package main
+package server
 
 import (
-	"InnoTaxi/api/auth"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"log"
+
+	"InnoTaxi/models"
 )
 
-var (
-	router = gin.Default()
-)
-
-func main() {
-	err := godotenv.Load("go.env")
-	if err != nil {
-		log.Fatal(err)
+func CheckRate(c *gin.Context) {
+	var phone int32
+	if err := c.ShouldBindJSON(&phone); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
+		return
 	}
-	router.POST("/login", auth.Login)
-	router.POST("/sign-in", auth.Register)
-	log.Fatal(router.Run(":8080"))
+
+	userRate, err := models.UserCheckRate(phone)
+	if err != nil {
+		c.JSON(http.StatusNotFound, "User not found")
+		return
+	}
+
+	c.JSON(http.StatusOK, userRate)
+}
+
+func CheckOrders(c *gin.Context) {
+
 }

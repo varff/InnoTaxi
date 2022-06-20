@@ -1,6 +1,9 @@
 package connection
 
-import "InnoTaxi/pkg/helper"
+import (
+	"InnoTaxi/pkg/helper"
+	"fmt"
+)
 
 func UserConString() string {
 	UserID := helper.GetEnvDefault("USERID", "user")
@@ -9,5 +12,5 @@ func UserConString() string {
 	Db := helper.GetEnvDefault("USERDB", "postgres")
 	Host := helper.GetEnvDefault("USERHOSTNAME", "localhost")
 
-	return string("user=" + UserID + " password=" + Pass + " host=" + Host + " port=" + Port + " database=" + Db)
+	return fmt.Sprintf("user=" + UserID + " password=" + Pass + " host=" + Host + " port=" + Port + " database=" + Db)
 }

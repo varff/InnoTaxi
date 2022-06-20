@@ -1,20 +1,22 @@
 package models
 
 import (
-	"InnoTaxi/connection"
 	"context"
+	"log"
+
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"log"
+
+	"InnoTaxi/connection"
 )
 
 type User struct {
-	username  string
+	Username  string
 	Password  string
-	phone     int32
-	email     string
-	rate      int32
-	isAnalyst string
+	Phone     int32
+	Email     string
+	Rate      int32
+	IsAnalyst string
 }
 
 func UserLogin(phone int32) (string, error) {
@@ -47,7 +49,7 @@ func UserRegister(Name, Password, Email string, Phone int32) (bool, error) {
 	return true, nil
 }
 
-func UserCheckRate(phone int) (int32, error) {
+func UserCheckRate(phone int32) (int32, error) {
 	var rate int32
 	db, _ := pgxpool.Connect(context.Background(), connection.UserConString())
 	defer db.Close()
