@@ -17,7 +17,7 @@ type User struct {
 	isAnalyst string
 }
 
-func UserLogin(phone int32, pass string) (bool, error) {
+func UserLogin(phone int32) (string, error) {
 	var result User
 	db, _ := pgxpool.Connect(context.Background(), connection.UserConString())
 	defer db.Close()
@@ -25,16 +25,13 @@ func UserLogin(phone int32, pass string) (bool, error) {
 	row := db.QueryRow(context.Background(), que, phone)
 	err := row.Scan(&result)
 	if err == pgx.ErrNoRows {
-		return false, nil
+		return "", nil
 	}
 	if err != nil {
 		log.Printf("User Login %s", err)
-		return false, err
+		return "", err
 	}
-	if result.Password != pass {
-		return false, nil
-	}
-	return true, nil
+	return result.Password, nil
 }
 
 func UserRegister(Name, Password, Email string, Phone int32) (bool, error) {

@@ -17,6 +17,6 @@ func main() {
 		log.Fatal(err)
 	}
 	router.POST("/login", auth.Login)
-	router.POST("/signin", auth.Register)
+	router.POST("/sign-in", auth.Register)
 	log.Fatal(router.Run(":8080"))
 }

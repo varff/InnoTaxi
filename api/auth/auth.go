@@ -5,6 +5,8 @@ import (
 	"InnoTaxi/pkg/helper"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -36,16 +38,27 @@ func CreateToken(phone int32, pass string) (string, error) {
 	return token, nil
 }
 
+func HashPass(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func CheckPassHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 func Login(c *gin.Context) {
 	var loginMod LoginModel
 	if err := c.ShouldBindJSON(&loginMod); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
 		return
 	}
-	login, err := models.UserLogin(loginMod.Phone, loginMod.Pass)
+	passHash, err := models.UserLogin(loginMod.Phone)
 	if err != nil {
 		return
 	}
+	login := CheckPassHash(loginMod.Pass, passHash)
 	if !login {
 		c.JSON(http.StatusUnauthorized, "Please provide valid login details")
 		return
@@ -64,7 +77,12 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
 		return
 	}
-	regged, err := models.UserRegister(regModel.Name, regModel.Pass, regModel.Email, regModel.Phone)
+	passwordHash, err := HashPass(regModel.Pass)
+	if err != nil {
+		log.Printf("Hashing error: %s", err)
+		return
+	}
+	regged, err := models.UserRegister(regModel.Name, passwordHash, regModel.Email, regModel.Phone)
 	if err != nil || !regged {
 		c.JSON(http.StatusUnprocessableEntity, "Invalid data")
 		return
